@@ -1,0 +1,111 @@
+/* ==========================================================================
+   Header: fixed top bar with section links (js/header-nav.js)
+   ========================================================================== */
+.header
+{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  background: linear-gradient(#070809f2 0%, #070809cc 55%, transparent);
+}
+.header__inner
+{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 68px;
+}
+.header__nav
+{
+  display: flex;
+  gap: 28px;
+  font: 500 12px var(--font-mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #c8c2b8;
+}
+.header__link:hover,
+.header__link--active
+{
+  color: var(--red);
+}
+
+/* Rain sound toggle in the top left corner, volume slider shows on hover (js/sound-toggle.js) */
+.header__sound
+{
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.header__sound-button
+{
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+.header__sound-button[aria-pressed="false"]
+{
+  color: var(--red);
+}
+.header__sound-button[aria-pressed="true"] .header__sound-mute,
+.header__sound-button[aria-pressed="false"] .header__sound-waves
+{
+  display: none;
+}
+.header__sound-volume
+{
+  width: 90px;
+  accent-color: var(--text);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .2s, visibility .2s;
+}
+.header__sound:hover .header__sound-volume,
+.header__sound:focus-within .header__sound-volume
+{
+  opacity: 1;
+  visibility: visible;
+}
+/* Muted: the slider hides at once, even under the pointer */
+.header__sound-button[aria-pressed="false"] ~ .header__sound-volume
+{
+  opacity: 0;
+  visibility: hidden;
+  transition: none;
+}
+
+@media (max-width: 520px)
+{
+  .header__nav
+  {
+    gap: 16px;
+    font-size: 11px;
+    letter-spacing: .5px;
+  }
+  .header__sound
+  {
+    left: 4px;
+  }
+  .header__sound-button
+  {
+    width: 32px;
+  }
+  /* No room next to the nav; phones set volume with their own buttons */
+  .header__sound-volume
+  {
+    display: none;
+  }
+}

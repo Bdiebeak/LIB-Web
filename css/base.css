@@ -1,0 +1,295 @@
+/* ==========================================================================
+   Base: fonts, design tokens, reset, page-wide overlays and shared blocks
+   ========================================================================== */
+
+@font-face
+{
+  font-family: 'Capture It';
+  src: url('../fonts/Capture_it.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root
+{
+  /* --- Colors --- */
+  --bg: #070809;                  /* Page background */
+  --text: #e9e3d8;                /* Default text */
+  --text-lead: #ded7ca;           /* Lead paragraphs under section titles */
+  --text-body: #d6d0c4;           /* Body copy in stages and location cards */
+  --text-dim: #9a9489;            /* Inactive tab labels */
+  --muted: #a39e96;               /* Secondary captions */
+  --red: #d63a33;                 /* Accent */
+  --red-glow: #ff4a3d;            /* Brighter accent for glows and markers */
+
+  /* --- Fonts --- */
+  --font-head: "Oswald", Impact, "Arial Narrow", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+  /* --- Layout --- */
+  --container-width: 1360px;      /* Max width of the centered content column */
+  --container-gutter: 48px;       /* Total side gutter of the column (both sides together) */
+
+  /* --- Page texture (grunge.jpg) --- */
+  --texture-tile: 1024px;         /* Size of one texture tile */
+  --texture-opacity: .35;         /* Strength of the texture over the background */
+  --texture-drift-time: 360s;     /* One loop of the slow fog-like drift: less = faster */
+}
+
+*
+{
+  box-sizing: border-box;
+}
+
+/* Native scrollbars are hidden: the page uses the custom .scrollbar block */
+html
+{
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar
+{
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+body
+{
+  margin: 0;
+  background: var(--bg) url("../img/grunge.jpg") 0 0 / var(--texture-tile) repeat;
+  color: var(--text);
+  font: 15px/1.6 var(--font-body);
+  overflow-x: hidden;
+}
+
+img
+{
+  display: block;
+  max-width: 100%;
+}
+
+a
+{
+  color: inherit;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3
+{
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* VHS look over the whole page: scanlines and animated film grain */
+body::before
+{
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: .09;
+  background: repeating-linear-gradient(0deg, transparent 0 2px, #fff 3px, transparent 4px);
+  mix-blend-mode: overlay;
+}
+body::after
+{
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: 51;
+  pointer-events: none;
+  opacity: .07;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 1s steps(4) infinite;
+}
+@keyframes grain
+{
+  0%, 100%
+  {
+    transform: translate(0, 0);
+  }
+  25%
+  {
+    transform: translate(-3%, 2%);
+  }
+  50%
+  {
+    transform: translate(2%, -3%);
+  }
+  75%
+  {
+    transform: translate(-2%, -1%);
+  }
+}
+
+/* ==========================================================================
+   Container: centered content column
+   ========================================================================== */
+.container
+{
+  width: min(var(--container-width), calc(100% - var(--container-gutter)));
+  margin: auto;
+}
+
+/* ==========================================================================
+   Eyebrow: small red mono caption above titles ("// TEXT")
+   ========================================================================== */
+.eyebrow
+{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 14px var(--font-mono);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.eyebrow::before
+{
+  content: "//";
+  color: var(--muted);
+  opacity: .6;
+}
+
+/* ==========================================================================
+   Section header: eyebrow + lead paragraphs at the top of a section
+   ========================================================================== */
+.section-header
+{
+  position: relative;
+  z-index: 5;
+  max-width: 760px;
+  margin-bottom: 36px;
+}
+.section-header__eyebrow
+{
+  margin-bottom: 20px;
+}
+.section-header__lead
+{
+  font-size: 15.5px;
+  line-height: 1.65;
+  color: var(--text-lead);
+}
+.section-header__lead p
+{
+  margin: 0 0 8px;
+}
+.section-header__lead p:last-child
+{
+  margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Texture: page grunge layer inside a section.
+   Pinned to the viewport (fixed), so the pattern continues seamlessly from one
+   section into the next and needs no dark fades at the joins. All layers share
+   one drift animation started on load, so they stay in sync; one loop moves a
+   whole number of tiles, so it never jumps. z-index 0 keeps it under pictures.
+   ========================================================================== */
+.texture
+{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url("../img/grunge.jpg") 0 0 / var(--texture-tile) repeat fixed;
+  opacity: var(--texture-opacity);
+  mix-blend-mode: screen;
+  animation: texture-drift var(--texture-drift-time) linear infinite;
+}
+/* Fades in from transparent: used at the bottom of the hero */
+.texture--fade-in
+{
+  -webkit-mask-image: linear-gradient(to bottom, transparent 30%, #000 100%);
+  mask-image: linear-gradient(to bottom, transparent 30%, #000 100%);
+}
+@keyframes texture-drift
+{
+  from
+  {
+    background-position: 0 0;
+  }
+  to
+  {
+    background-position: calc(var(--texture-tile) * -2) var(--texture-tile);
+  }
+}
+
+/* ==========================================================================
+   Rain layer: pixel canvas with animated rain streaks (see js/rain-streaks.js).
+   Drawn at a fraction of the screen resolution and upscaled without smoothing,
+   so drops get the same chunky pixels as the artwork.
+   ========================================================================== */
+.rain-layer
+{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+
+/* ==========================================================================
+   Scrollbar: slim custom thumb without a track or arrows (js/custom-scrollbar.js)
+   ========================================================================== */
+.scrollbar
+{
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  width: 12px;
+}
+.scrollbar__thumb
+{
+  position: absolute;
+  top: 0;
+  right: 1px;
+  width: 3px;
+  border-radius: 2px;
+  background: rgba(233, 227, 216, .45);
+  cursor: pointer;
+  transition: width .15s ease, background .15s ease;
+}
+.scrollbar:hover .scrollbar__thumb,
+.scrollbar__thumb--dragging
+{
+  width: 4.5px;
+  background: rgba(233, 227, 216, .85);
+}
+
+@media (max-width: 520px)
+{
+  .container
+  {
+    width: calc(100% - 32px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce)
+{
+  *,
+  *::before,
+  *::after
+  {
+    animation: none !important;
+    transition: none !important;
+  }
+  html
+  {
+    scroll-behavior: auto;
+  }
+}

@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LEAVE IT BY</title>
+<meta property="og:title" content="LEAVE IT BY">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/header.css">
+<link rel="stylesheet" href="css/intro.css">
+<link rel="stylesheet" href="css/about.css">
+<link rel="stylesheet" href="css/cycle.css">
+<link rel="stylesheet" href="css/world.css">
+<link rel="stylesheet" href="css/outro.css">
+<script src="js/utils.js" defer></script>
+<script src="js/rain-streaks.js" defer></script>
+<script src="js/custom-scrollbar.js" defer></script>
+<script src="js/header-nav.js" defer></script>
+<script src="js/sound-toggle.js" defer></script>
+<script src="js/windshield.js" defer></script>
+<script src="js/flashlight.js" defer></script>
+<script src="js/game-cycle.js" defer></script>
+<script src="js/locations-slider.js" defer></script>
+<script src="js/world-map.js" defer></script>
+<script src="js/main.js" defer></script>
+</head>
+<body>
+
+<header class="header">
+  <div class="header__sound">
+    <button class="header__sound-button" type="button" aria-pressed="true" aria-label="Звук дождя">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 9h4l5-4v14l-5-4H4z"/>
+        <path class="header__sound-waves" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>
+        <path class="header__sound-mute" d="M17 9.5l5 5M22 9.5l-5 5"/>
+      </svg>
+    </button>
+    <input class="header__sound-volume" type="range" min="0" max="1" step="0.01" value="0.5" aria-label="Громкость дождя">
+    <audio src="audio/rain-loop.wav" loop preload="none"></audio>
+  </div>
+  <div class="container header__inner">
+    <nav class="header__nav">
+      <a class="header__link" href="#top">Главная</a>
+      <a class="header__link" href="#about">Описание</a>
+      <a class="header__link" href="#cycle">Геймплей</a>
+      <a class="header__link" href="#world">Мир</a>
+      <a class="header__link" href="#feedback">Фидбек</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ======================================================================
+     Заставка с названием игры
+     ====================================================================== -->
+<section class="intro">
+  <div class="intro__scene" role="img">
+    <div class="intro__lamp"></div>
+  </div>
+  <canvas class="intro__rain rain-layer" data-live-rain aria-hidden="true"></canvas>
+  <div class="intro__overlay">
+    <div class="container intro__container">
+      <div class="eyebrow">Friendslop atmospheric horror</div>
+      <h1 class="intro__title">Le<span class="intro__title-kern">a</span>ve it by<span class="intro__title-dots">...</span></h1>
+    </div>
+  </div>
+  <div class="intro__fade" aria-hidden="true">
+    <div class="texture texture--fade-in"></div>
+  </div>
+</section>
+
+<!-- ======================================================================
+     Описание: вид из кабины с каплями на стекле
+     ====================================================================== -->
+<section id="about" class="about">
+  <div class="texture" aria-hidden="true"></div>
+  <div class="about__visual" aria-hidden="true">
+    <img class="about__layer about__layer--photo" src="img/cabin-dry.png" alt="Вид из кабины курьерского фургона на ночную дорогу" width="1376" height="768" loading="lazy">
+    <canvas class="about__layer about__layer--creature" width="1376" height="768"></canvas>
+    <canvas class="about__layer about__layer--fall" width="688" height="384"></canvas>
+    <canvas class="about__layer about__layer--drops" width="688" height="384"></canvas>
+  </div>
+  <div class="container">
+    <div class="about__content">
+      <div class="section-header">
+        <div class="eyebrow section-header__eyebrow">Описание</div>
+        <div class="section-header__lead">
+          <p>Это кооперативный атмосферный хоррор о ночных курьерах.</p>
+          <p>Вы получаете странные заказы, ищете предметы в бесконечном процедурно генерируемом мире и доставляете загадочному адресату.</p>
+          <p>То, что начинается как рутина, с каждым рейсом всё сильнее нарушает привычную реальность.</p>
+        </div>
+      </div>
+
+      <div class="about__features">
+        <div class="about__feature">
+          <div class="about__feature-tag">// КООПЕРАТИВ</div>
+          <div class="about__feature-title">БЕЗ РАМОК</div>
+          <p class="about__feature-text">Играйте соло или большой компанией. Распределяйте ответсвенность и решайте трудности, возникающие перед вами.</p>
+        </div>
+        <div class="about__feature">
+          <div class="about__feature-tag">// МИР</div>
+          <div class="about__feature-title">БЕЗ КРАЯ</div>
+          <p class="about__feature-text">Мир не заканчивается за горизонтом. Исследуйте незнакомые места, находите свой путь и никогда не знайте наверняка, что ждёт за следующим поворотом.</p>
+        </div>
+        <div class="about__feature">
+          <div class="about__feature-tag">// ТРАНСПОРТ</div>
+          <div class="about__feature-title">ОБЩИЙ ФУРГОН</div>
+          <p class="about__feature-text">Мобильная база, общий склад находок и единственное укрытие среди ночи. Покидайте его, но не теряйте из виду.</p>
+        </div>
+        <div class="about__feature">
+          <div class="about__feature-tag">// АТМОСФЕРА</div>
+          <div class="about__feature-title">САСПЕНС БЕЗ СКРИМЕРОВ</div>
+          <p class="about__feature-text">Страх нарастает с каждым рейсом. Странные звуки, необъяснимые события. Тот, кто ждёт посылку, кажется, знает о вас слишком много.</p>
+        </div>
+        <div class="about__feature">
+          <div class="about__feature-tag">// ПОИСК</div>
+          <div class="about__feature-title">СБОР ПОСЫЛОК</div>
+          <p class="about__feature-text">Обыскивайте мотели, заброшенные склады и обочины, чтобы собрать нужные предметы.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================================
+     Игровой цикл: 5 этапов рейса
+     ====================================================================== -->
+<section id="cycle" class="cycle">
+  <div class="texture" aria-hidden="true"></div>
+  <div class="container">
+    <div class="section-header">
+      <div class="eyebrow section-header__eyebrow">О ЦИКЛЕ</div>
+      <div class="section-header__lead">
+        <p>Каждый рейс - это новая вылазка в ночную глушь.</p>
+        <p>Дороги ведут через незнакомые места, а привычные маршруты не всегда остаются прежними. Вас ждут неожиданные находки, странности и головоломки, которые потребуют нестандартных решений.</p>
+        <p>Держитесь вместе, помогайте друг другу и не забывайте о том, что иногда опасность едет с вами в одной машине.</p>
+      </div>
+    </div>
+
+    <div class="cycle__tabs">
+      <button class="cycle__tab cycle__tab--active" type="button">
+        <span class="cycle__tab-step">01</span>
+        <span class="cycle__tab-name">ПОЛУЧЕНИЕ</span>
+      </button>
+      <button class="cycle__tab" type="button">
+        <span class="cycle__tab-step">02</span>
+        <span class="cycle__tab-name">ПОИСК</span>
+      </button>
+      <button class="cycle__tab" type="button">
+        <span class="cycle__tab-step">03</span>
+        <span class="cycle__tab-name">ПОГРУЗКА</span>
+      </button>
+      <button class="cycle__tab" type="button">
+        <span class="cycle__tab-step">04</span>
+        <span class="cycle__tab-name">ДОСТАВКА</span>
+      </button>
+      <button class="cycle__tab" type="button">
+        <span class="cycle__tab-step">05</span>
+        <span class="cycle__tab-name">НАГРАДА</span>
+      </button>
+    </div>
+
+    <div class="cycle__stages">
+      <!-- Этап 1: получение накладной -->
+      <div class="cycle__stage cycle__stage--active">
+        <div class="cycle__info">
+          <div class="cycle__stage-tag">// ЭТАП 01</div>
+          <h3 class="cycle__stage-title">ПОЛУЧЕНИЕ НАКЛАДНОЙ</h3>
+          <p class="cycle__stage-desc">Каждый рейс начинается с курьерского терминала. Вместо готовой посылки вы получаете список разрозненных предметов и особые указания заказчика.</p>
+        </div>
+        <div class="waybill">
+          <div class="waybill__paper">
+            <img class="waybill__image" src="img/cycle-paper.png" alt="">
+            <div class="waybill__text">
+              <div class="waybill__caption">КУРЬЕРСКАЯ СЛУЖБА</div>
+              <div class="waybill__order">ЗАКАЗ №<span class="waybill__order-number">1047</span></div>
+              <div class="waybill__label">СОБРАТЬ:</div>
+              <ol class="waybill__items">
+                <li>Бутылка масла</li>
+                <li>Старая деревянная швабра</li>
+                <li>Три красные восковые свечи</li>
+              </ol>
+              <div class="waybill__label">ПРИМЕЧАНИЕ:</div>
+              <p class="waybill__note">Оставьте вещи строго на нижней ступени крыльца. В окна второго этажа ни при каких обстоятельствах не смотреть.</p>
+              <div class="waybill__payment">
+                <span class="waybill__label">ОПЛАТА:</span>
+                <span class="waybill__sum">$180 + ржавый ключ от ячейки</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Этап 2: поиск с фонариком -->
+      <div class="cycle__stage">
+        <div class="cycle__info">
+          <div class="cycle__stage-tag">// ЭТАП 02</div>
+          <h3 class="cycle__stage-title">ПОИСК ПРЕДМЕТОВ</h3>
+          <p class="cycle__stage-desc">Вы покидаете фургон и исследуете ночные локации. В темноте путь освещают фары фургона и свет карманного фонарика. Иногда то, что долго не удавалось найти, необъяснимым образом оказывается прямо у вас под ногами.</p>
+        </div>
+        <div class="cycle__bleed flashlight" aria-hidden="true">
+          <div class="flashlight__dim"></div>
+          <div class="flashlight__beam"></div>
+        </div>
+      </div>
+
+      <!-- Этап 3: погрузка в фургон -->
+      <div class="cycle__stage">
+        <div class="cycle__info">
+          <div class="cycle__stage-tag">// ЭТАП 03</div>
+          <h3 class="cycle__stage-title">ПОГРУЗКА В ФУРГОН</h3>
+          <p class="cycle__stage-desc">Фургон - ваш общий склад на колёсах и средство передвижения. Найденные предметы нужно погрузить в кузов и упаковать согласно заказу. Тяжёлые ящики придётся переносить вдвоём, а при резком торможении груз может повредиться.</p>
+        </div>
+        <div class="cycle__bleed">
+          <img class="cycle__bleed-image" src="img/loop-box.png" alt="Собранная посылка в кузове фургона">
+        </div>
+      </div>
+
+      <!-- Этап 4: доставка у двери -->
+      <div class="cycle__stage">
+        <div class="cycle__info">
+          <div class="cycle__stage-tag">// ЭТАП 04</div>
+          <h3 class="cycle__stage-title">ДОСТАВКА ДО ДВЕРИ</h3>
+          <p class="cycle__stage-desc">Доберитесь до указанного адреса, следуя маршруту из курьерского навигатора. Оставьте собранную посылку у двери. И всегда помните главное правило курьерской службы - выполнить условия заказа.</p>
+        </div>
+        <div class="cycle__bleed">
+          <img class="cycle__bleed-image" src="img/loop-door.png" alt="Посылка на коврике у приоткрытой двери">
+        </div>
+      </div>
+
+      <!-- Этап 5: награда и улучшения - замыкает цикл -->
+      <div class="cycle__stage">
+        <div class="cycle__info">
+          <div class="cycle__stage-tag">// ЭТАП 05</div>
+          <h3 class="cycle__stage-title">НАГРАДА И УЛУЧШЕНИЯ</h3>
+          <p class="cycle__stage-desc">За выполненный заказ вы получаете награду в ячейке постамата — там же, где вас ждёт следующая накладная. Тратьте заработанное через бортовой терминал фургона, покупайте новое снаряжение и улучшайте машину, чтобы каждый следующий рейс проходил чуть более комфортно.</p>
+          <button class="cycle__restart" type="button">↻ НОВЫЙ РЕЙС</button>
+        </div>
+        <div class="cycle__bleed">
+          <img class="cycle__bleed-image" src="img/loop-upgrade.png" alt="Терминал заказа улучшений в кузове фургона">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================================
+     Мир: карта чанков на навигаторе и карточки локаций
+     ====================================================================== -->
+<section id="world" class="world">
+  <div class="texture" aria-hidden="true"></div>
+  <div class="container">
+    <div class="section-header">
+      <div class="eyebrow section-header__eyebrow">СИСТЕМА МИРА И ЛОКАЦИИ</div>
+      <div class="section-header__lead">
+        <p>Мир вокруг вас постоянно меняется.</p>
+        <p>Пока вы путешествуете, одни места исчезают за спиной, а впереди всегда найдётся дорога, по которой вы ещё не ездили.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="world__grid">
+    <!-- Навигатор с картой -->
+    <div class="navigator">
+      <div class="navigator__device">
+        <div class="navigator__screen">
+          <div class="navigator__scanlines"></div>
+          <div class="navigator__frame">
+            <button class="navigator__arrow navigator__arrow--up" type="button" data-direction="up" title="Вверх (W)"><span class="navigator__arrow-glyph">▲</span><span class="navigator__key">W</span></button>
+            <button class="navigator__arrow navigator__arrow--down" type="button" data-direction="down" title="Вниз (S)"><span class="navigator__key">S</span><span class="navigator__arrow-glyph">▼</span></button>
+            <button class="navigator__arrow navigator__arrow--left" type="button" data-direction="left" title="Влево (A)"><span class="navigator__arrow-glyph">◄</span><span class="navigator__key">A</span></button>
+            <button class="navigator__arrow navigator__arrow--right" type="button" data-direction="right" title="Вправо (D)"><span class="navigator__key">D</span><span class="navigator__arrow-glyph">►</span></button>
+            <div class="navigator__grid"></div>
+          </div>
+        </div>
+
+        <div class="navigator__legend">
+          <span class="navigator__legend-item"><span class="navigator__swatch navigator__swatch--van"></span> Фургон</span>
+          <span class="navigator__legend-item"><span class="navigator__swatch navigator__swatch--streamed"></span> Загружен</span>
+          <span class="navigator__legend-item"><span class="navigator__swatch navigator__swatch--unloaded"></span> Выгружен</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Карточки локаций -->
+    <div class="locations">
+      <div class="locations__slides">
+        <div class="locations__slide locations__slide--active">
+          <div class="locations__media">
+            <img class="locations__image" src="img/loc-post.png" alt="Курьерский постамат ночью на обочине дороги под дождём">
+          </div>
+          <div class="locations__body">
+            <div class="locations__type">// ПУНКТ ЗАКАЗОВ И НАГРАД</div>
+            <h3 class="locations__name">КУРЬЕРСКИЙ ПОСТАМАТ</h3>
+            <p class="locations__desc">Автономный терминал на обочине шоссе. Здесь вас ждут накладные новых рейсов и награды за выполненные доставки. Экран терминала слабо мерцает зелёным светом в дождливой мгле.</p>
+          </div>
+        </div>
+
+        <div class="locations__slide">
+          <div class="locations__media">
+            <img class="locations__image" src="img/loc-gas.png" alt="Заброшенная заправка ночью под дождём">
+          </div>
+          <div class="locations__body">
+            <div class="locations__type">// ПРИДОРОЖНАЯ ТОЧКА</div>
+            <h3 class="locations__name">ЗАБРОШЕННАЯ ЗАПРАВКА</h3>
+            <p class="locations__desc">Одинокая топливная колонка на перекрёстке старого шоссе и лесной дороги. Вывеска тускло светится над потрескавшимся асфальтом. Здесь можно найти топливо, но оператора давно никто не видел.</p>
+          </div>
+        </div>
+
+        <div class="locations__slide">
+          <div class="locations__media">
+            <img class="locations__image" src="img/loc-farm.png" alt="Старая ферма и амбар в темноте">
+          </div>
+          <div class="locations__body">
+            <div class="locations__type">// ОКРЕСТНОСТИ</div>
+            <h3 class="locations__name">СТАРАЯ ФЕРМА</h3>
+            <p class="locations__desc">Заброшенный амбар среди заросших кукурузных полей. В темноте между стойлами затерялись забытые инструменты и странные вещи, а сквозь щели в крыше иногда пробивается холодный свет.</p>
+          </div>
+        </div>
+
+        <div class="locations__slide">
+          <div class="locations__media">
+            <img class="locations__image" src="img/loc-house.png" alt="Старый дом №12 с почтовым ящиком">
+          </div>
+          <div class="locations__body">
+            <div class="locations__type">// ЖИЛОЙ СЕКТОР</div>
+            <h3 class="locations__name">ВЕТХИЙ ДОМ</h3>
+            <p class="locations__desc">Двухэтажный деревянный дом. В окне второго этажа всегда горит свет, а на крыльце покачивается кресло. Неужели здесь действительно кто-то ждёт посылку?</p>
+          </div>
+        </div>
+
+        <!-- Живой дождь поверх картинок всех локаций -->
+        <canvas class="locations__rain rain-layer" data-live-rain aria-hidden="true"></canvas>
+      </div>
+
+      <div class="locations__tabs">
+        <button class="locations__tab locations__tab--active" type="button">
+          <span class="locations__tab-num">01</span>
+          <span class="locations__tab-label">ПОСТАМАТ</span>
+        </button>
+        <button class="locations__tab" type="button">
+          <span class="locations__tab-num">02</span>
+          <span class="locations__tab-label">ЗАПРАВКА</span>
+        </button>
+        <button class="locations__tab" type="button">
+          <span class="locations__tab-num">03</span>
+          <span class="locations__tab-label">ФЕРМА</span>
+        </button>
+        <button class="locations__tab" type="button">
+          <span class="locations__tab-num">04</span>
+          <span class="locations__tab-label">СТАРЫЙ ДОМ</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================================
+     Обратная связь: финальный экран со ссылкой на форму
+     ====================================================================== -->
+<section id="feedback" class="outro">
+  <div class="texture" aria-hidden="true"></div>
+  <div class="outro__visual" aria-hidden="true">
+    <img class="outro__image" src="img/outro-van.png" alt="" loading="lazy">
+    <canvas class="outro__rain rain-layer" data-live-rain></canvas>
+  </div>
+  <div class="container">
+    <div class="outro__content">
+      <div class="eyebrow outro__eyebrow">ОБРАТНАЯ СВЯЗЬ</div>
+      <div class="outro__lead">
+        <p>Сейчас мы планируем создать одиночный прототип игры, чтобы передать её атмосферу и показать геймплей.</p>
+        <p>Многие игровые механики ещё обсуждаются, поэтому именно сейчас ваше мнение может повлиять на то, какой станет игра в итоге.</p>
+        <p>Расскажите, что зацепило, что смутило и чего вы ждёте от игры.</p>
+      </div>
+      <!-- Ссылка на Google Форму -->
+      <a class="outro__button" href="https://forms.gle/Gitpj2JMgBer8dVp6" target="_blank" rel="noopener">Поделиться мнением</a>
+    </div>
+  </div>
+  <div class="outro__footer">
+    <div class="container">Ранний концепт // 2026</div>
+  </div>
+</section>
+
+</main>
+
+<div class="scrollbar">
+  <div class="scrollbar__thumb"></div>
+</div>
+
+</body>
+</html>

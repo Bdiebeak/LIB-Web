@@ -1,0 +1,129 @@
+/* ==========================================================================
+   Intro: full-screen hero with the game title
+   ========================================================================== */
+.intro
+{
+  --scene-focus: .694;            /* Horizontal point (0..1 of the image) kept in view on narrow screens: the door */
+
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Keeps the image aspect (intro-door.png is 1376x768) and covers the screen; on narrow screens it shifts to keep the door in view */
+.intro__scene
+{
+  --scene-width: max(100vw, 100vh * 1376 / 768);
+
+  position: absolute;
+  top: 0;
+  left: clamp(100vw - var(--scene-width), 50vw - var(--scene-width) * var(--scene-focus), 0px);
+  width: var(--scene-width);
+  aspect-ratio: 1376 / 768;
+  background: url("../img/intro-door.png") 0 0 / 100% 100%;
+  image-rendering: pixelated;
+}
+
+/* Porch bulb flicker: a shadow centered on the painted bulb (image px 972, 78) blinks in over its light */
+.intro__lamp
+{
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(circle at 70.6% 10.2%, #000e 0 1.2%, #000b 5%, #0007 16%, transparent 38%);
+  animation: lamp-flicker 5s step-end infinite;
+}
+@keyframes lamp-flicker
+{
+  0%, 60%, 67%, 88%, 90%, 100%
+  {
+    opacity: 0;
+  }
+  61%
+  {
+    opacity: .85;
+  }
+  62%
+  {
+    opacity: .15;
+  }
+  63%
+  {
+    opacity: .9;
+  }
+  65%
+  {
+    opacity: .4;
+  }
+  89%
+  {
+    opacity: .6;
+  }
+}
+
+.intro__overlay
+{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, #000a, transparent 55%);
+}
+
+/* Pinned to the left edge instead of the centered column */
+.intro__container
+{
+  position: relative;
+  width: auto;
+  margin: 0 0 0 clamp(20px, 5vw, 96px);
+  padding: 80px 0;
+}
+
+.intro__title
+{
+  margin: 10px 0 26px;
+  font-family: 'Capture It', var(--font-head);
+  font-size: clamp(64px, 11vw, 148px);
+  line-height: .88;
+  letter-spacing: .005em;
+  background-image:
+    /* high-contrast monochrome grunge cracks and peeling paint */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.045 0.08' numOctaves='4' result='noise'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.4' intercept='-0.6'/%3E%3CfeFuncG type='linear' slope='2.4' intercept='-0.6'/%3E%3CfeFuncB type='linear' slope='2.4' intercept='-0.6'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' fill='%23fff'/%3E%3C/svg%3E"),
+    /* worn metallic plaster base */
+    linear-gradient(180deg, #fff 0%, #f4ede3 25%, #e0d8cc 55%, #b5ad9f 80%, #ccc4b6 100%);
+  background-size: 220px 220px, 100% 100%;
+  background-blend-mode: overlay, normal;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter:
+    drop-shadow(0 0 2px rgba(0, 0, 0, .9))
+    drop-shadow(0 4px 12px rgba(0, 0, 0, .95))
+    drop-shadow(0 0 25px rgba(0, 0, 0, .75));
+}
+/* Tightens the pair "AV" in the font */
+.intro__title-kern
+{
+  display: inline-block;
+  margin-right: -.175em;
+}
+.intro__title-dots
+{
+  margin-left: .1em;
+  letter-spacing: .1em;
+}
+
+/* Bottom fade into the page; the texture inside fades in, so the hero dissolves straight into the textured page */
+.intro__fade
+{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  height: 280px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent 0%, var(--bg) 100%);
+}

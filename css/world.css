@@ -1,0 +1,581 @@
+/* ==========================================================================
+   World: chunked world map and location cards
+   ========================================================================== */
+.world
+{
+  /* --- Two columns: navigator / location cards --- */
+  --world-navigator-width: 46%;   /* Width of the left column with the navigator */
+  --world-locations-width: 50%;   /* Width of the right column with the location cards */
+  --world-gap: 3vw;               /* Gap between the columns */
+  --world-padding: 5vw;           /* Padding from the left and right screen edges */
+
+  position: relative;
+  padding: 60px 0;
+  overflow: hidden;
+  background: var(--bg);
+}
+.world__grid
+{
+  position: relative;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: var(--world-navigator-width) var(--world-locations-width);
+  align-items: center;
+  gap: var(--world-gap);
+  width: 100%;
+  padding: 0 var(--world-padding);
+}
+
+/* ==========================================================================
+   Navigator: dashboard CRT with the 5x5 chunk map (js/world-map.js)
+   ========================================================================== */
+.navigator
+{
+  /* --- CRT screen placement on the dashboard photo --- */
+  --navigator-cell-size: 46px;    /* Size of one map cell */
+  --navigator-icon-size: 16px;    /* Size of location and van icons on the map */
+  --navigator-screen-width: 48%;  /* Screen width, % of the dashboard */
+  --navigator-screen-height: 51%; /* Screen height, % of the dashboard */
+  --navigator-screen-left: 24.75%;/* Screen offset from the left edge of the dashboard */
+  --navigator-screen-top: 26.5%;  /* Screen offset from the top edge of the dashboard */
+  --navigator-screen-radius: 18.5% / 15%; /* Rounded corners of the tube */
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Dashboard unit; the cell size scales with its width (container query units) */
+.navigator__device
+{
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.35 / 1;
+  container-type: inline-size;
+}
+/* Dashboard photo with a soft fade into the page on all four sides */
+.navigator__device::before
+{
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: url("../img/dash-nav.png") 51.5% 51.8% / 185% auto no-repeat;
+  image-rendering: pixelated;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, rgba(0, 0, 0, .5) 4%, #000 12%, #000 86%, rgba(0, 0, 0, .6) 94%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, .5) 4%, #000 10%, #000 88%, rgba(0, 0, 0, .5) 95%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, rgba(0, 0, 0, .5) 4%, #000 12%, #000 86%, rgba(0, 0, 0, .6) 94%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, .5) 4%, #000 10%, #000 88%, rgba(0, 0, 0, .5) 95%, transparent 100%);
+  mask-composite: intersect;
+}
+
+/* CRT screen fitted over the housing opening, hiding its bright edges */
+.navigator__screen
+{
+  position: absolute;
+  top: var(--navigator-screen-top);
+  left: var(--navigator-screen-left);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--navigator-screen-width);
+  height: var(--navigator-screen-height);
+  overflow: hidden;
+  border-radius: var(--navigator-screen-radius);
+  background: rgba(5, 11, 8, .94);
+  box-shadow: inset 0 0 30px #000, inset 0 0 60px rgba(0, 18, 9, .8);
+}
+.navigator__scanlines
+{
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, .35) 3px);
+}
+.navigator__frame
+{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 24px 28px;
+}
+
+.navigator__grid
+{
+  --cell: min(var(--navigator-cell-size), calc(27cqw / 5));
+
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(5, var(--cell));
+  grid-template-rows: repeat(5, var(--cell));
+  gap: 3px;
+}
+
+/* --- Map cells (created in JS) --- */
+.navigator__cell
+{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0d1410;
+  cursor: pointer;
+  user-select: none;
+  transition: background .18s ease, border-color .18s ease, box-shadow .18s ease, transform .15s ease;
+}
+.navigator__cell:hover
+{
+  z-index: 5;
+  border-color: rgba(120, 240, 160, .85) !important;
+  box-shadow: inset 0 0 12px rgba(72, 199, 116, .45), 0 0 10px rgba(72, 199, 116, .4) !important;
+  transform: scale(1.04);
+}
+/* Chunk next to the van: generated and kept in memory */
+.navigator__cell--streamed
+{
+  border: 1px solid rgba(48, 76, 58, .6);
+  background: #1a2820;
+}
+.navigator__cell--streamed:hover
+{
+  background: #25382d;
+}
+/* Chunk with the van */
+.navigator__cell--current
+{
+  background: rgba(214, 58, 51, .22);
+  box-shadow: inset 0 0 18px rgba(214, 58, 51, .55);
+}
+.navigator__cell--current:hover
+{
+  border-color: rgba(255, 90, 80, .9) !important;
+  box-shadow: inset 0 0 20px rgba(214, 58, 51, .75), 0 0 12px rgba(214, 58, 51, .55) !important;
+}
+/* Far chunk: unloaded */
+.navigator__cell--unloaded
+{
+  border: 1px dashed rgba(233, 227, 216, .22);
+  background: rgba(10, 16, 12, .5);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, .5);
+  opacity: .75;
+}
+.navigator__cell--unloaded:hover
+{
+  border-style: solid;
+  background: rgba(26, 42, 32, .85);
+  opacity: 1;
+}
+
+/* Location icon and van marker inside a cell */
+.navigator__poi,
+.navigator__van
+{
+  --icon: min(var(--navigator-icon-size), calc(var(--cell) * .72));
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  line-height: 1;
+}
+.navigator__poi svg
+{
+  display: block;
+  width: var(--icon);
+  height: var(--icon);
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .8));
+}
+.navigator__van
+{
+  position: relative;
+  width: var(--icon);
+  height: var(--icon);
+  font-size: var(--icon);
+}
+
+/* --- Edge arrows with WASD hints --- */
+.navigator__arrow
+{
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: 1;
+  color: rgba(233, 227, 216, .75);
+  cursor: pointer;
+  transition: color .15s, text-shadow .15s, transform .15s;
+}
+.navigator__arrow:hover,
+.navigator__arrow--pressed
+{
+  color: var(--red-glow);
+  text-shadow: 0 0 10px var(--red);
+}
+.navigator__arrow-glyph
+{
+  display: block;
+  font-size: 13px;
+  line-height: 1;
+}
+.navigator__key
+{
+  display: block;
+  font: 700 11px var(--font-mono);
+  line-height: 1;
+  letter-spacing: .5px;
+  color: rgba(233, 227, 216, .6);
+  transition: color .15s, text-shadow .15s;
+}
+.navigator__arrow:hover .navigator__key,
+.navigator__arrow--pressed .navigator__key
+{
+  color: #fff;
+  text-shadow: 0 0 8px var(--red);
+}
+.navigator__arrow--up,
+.navigator__arrow--down
+{
+  left: 50%;
+  flex-direction: column;
+  gap: 3px;
+  width: 32px;
+  transform: translateX(-50%);
+}
+.navigator__arrow--up
+{
+  top: 3px;
+}
+.navigator__arrow--down
+{
+  bottom: 3px;
+}
+.navigator__arrow--left,
+.navigator__arrow--right
+{
+  top: 50%;
+  flex-direction: row;
+  gap: 5px;
+  height: 32px;
+  transform: translateY(-50%);
+}
+.navigator__arrow--left
+{
+  left: 5px;
+}
+.navigator__arrow--right
+{
+  right: 5px;
+}
+
+/* --- Legend on the bottom bezel --- */
+.navigator__legend
+{
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  font: 600 11px var(--font-mono);
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgba(220, 215, 205, .9);
+  text-shadow: 0 1px 3px #000;
+}
+.navigator__legend-item
+{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.navigator__swatch
+{
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+}
+.navigator__swatch--van
+{
+  background: var(--red);
+  box-shadow: 0 0 8px rgba(214, 58, 51, .8);
+}
+.navigator__swatch--streamed
+{
+  border: 1px solid rgba(48, 76, 58, .7);
+  background: #1a2820;
+}
+.navigator__swatch--unloaded
+{
+  border: 1px dashed rgba(233, 227, 216, .35);
+  background: rgba(10, 16, 12, .5);
+}
+
+/* ==========================================================================
+   Locations: location cards; the picture bleeds into the page, text sits over it (js/locations-slider.js)
+   ========================================================================== */
+.locations
+{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 640px;
+}
+.locations__slides
+{
+  position: absolute;
+  inset: 0;
+}
+.locations__slide
+{
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+.locations__slide--active
+{
+  display: block;
+  animation: locations-slide-fade .4s ease-out;
+}
+@keyframes locations-slide-fade
+{
+  from
+  {
+    opacity: .3;
+  }
+  to
+  {
+    opacity: 1;
+  }
+}
+
+/* Picture and live rain share the feathered mask: long soft fade at the top, short at the bottom and sides */
+.locations__media,
+.locations__rain
+{
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 16%, #000 88%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, .08) 12%, rgba(0, 0, 0, .4) 24%, #000 38%, #000 82%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 16%, #000 88%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, .08) 12%, rgba(0, 0, 0, .4) 24%, #000 38%, #000 82%, transparent 100%);
+  mask-composite: intersect;
+}
+/* Shading for the text and pixel scanlines over the picture */
+.locations__media::after
+{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to top, var(--bg) 0%, rgba(7, 8, 9, .75) 32%, transparent 58%),
+    repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, .2) 3px);
+}
+.locations__image
+{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+/* One rain canvas for all slides; it fades out above the location text (--rain-cutoff is set from JS),
+   so it doesn't flicker behind the letters */
+.locations__rain
+{
+  z-index: 2;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 16%, #000 88%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, .08) 12%, rgba(0, 0, 0, .4) 24%, #000 38%, #000 calc(var(--rain-cutoff, 55%) - 140px), transparent calc(var(--rain-cutoff, 55%) - 20px));
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 16%, #000 88%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, .08) 12%, rgba(0, 0, 0, .4) 24%, #000 38%, #000 calc(var(--rain-cutoff, 55%) - 140px), transparent calc(var(--rain-cutoff, 55%) - 20px));
+}
+
+.locations__body
+{
+  position: absolute;
+  left: 8%;
+  right: 36px;
+  bottom: 96px;
+  z-index: 3;
+}
+.locations__type
+{
+  margin-bottom: 6px;
+  font: 500 12px var(--font-mono);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.locations__name
+{
+  margin: 0 0 14px;
+  font: 700 clamp(30px, 3.4vw, 44px)/1.05 var(--font-head);
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.locations__desc
+{
+  max-width: 520px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-body);
+}
+
+/* --- Location tabs: soft glowing indicator with a feathered mask --- */
+.locations__tabs
+{
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Extra 26px below (and shifted down by as much) so the active tab's glow fits inside the mask instead of being cut off */
+  bottom: -26px;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 28px 40px 40px;
+  background: linear-gradient(to top, transparent 0%, rgba(7, 8, 9, .85) 40%, rgba(7, 8, 9, .65) 65%, transparent 100%);
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 25%, #000 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, #000 10%, #000 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 25%, #000 100%);
+  mask-composite: intersect;
+}
+.locations__tab
+{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 12px 6px 14px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  font: 500 12px var(--font-mono);
+  letter-spacing: .5px;
+  text-align: center;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color .25s ease, background .25s ease;
+}
+/* Glowing underline, lit on the active tab */
+.locations__tab::after
+{
+  content: "";
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  bottom: 0;
+  height: 3px;
+  border-radius: 50%;
+  background: transparent;
+  filter: blur(1px);
+  pointer-events: none;
+  transition: all .3s ease;
+}
+.locations__tab:hover
+{
+  color: #fff;
+}
+.locations__tab--active
+{
+  color: #fff;
+  background: radial-gradient(ellipse at 50% 90%, rgba(214, 58, 51, .14) 0%, transparent 72%);
+}
+.locations__tab--active::after
+{
+  background: radial-gradient(ellipse at center, var(--red) 0%, rgba(214, 58, 51, .8) 45%, transparent 100%);
+  box-shadow: 0 0 12px 2px rgba(214, 58, 51, .85), 0 0 24px 6px rgba(214, 58, 51, .4);
+}
+.locations__tab-num
+{
+  font-size: 10px;
+  color: var(--red);
+}
+
+@media (max-width: 960px)
+{
+  .world__grid
+  {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 0 20px;
+  }
+  .navigator
+  {
+    align-items: center;
+  }
+  .locations__body,
+  .locations__tabs
+  {
+    left: 0;
+    right: 0;
+  }
+}
+
+@media (max-width: 600px)
+{
+  .world
+  {
+    padding: 80px 0 100px;
+  }
+  .world__grid
+  {
+    padding: 0 16px;
+  }
+  .navigator
+  {
+    --navigator-cell-size: 24px;
+
+    padding: 0 0 20px;
+  }
+  .navigator__legend
+  {
+    gap: 14px;
+    font-size: 10px;
+  }
+  .locations
+  {
+    min-height: 720px;
+  }
+  .locations__body
+  {
+    bottom: 120px;
+  }
+  .locations__tabs
+  {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -1,0 +1,402 @@
+/* ==========================================================================
+   Cycle: gameplay loop in 5 stages (js/game-cycle.js)
+   ========================================================================== */
+.cycle
+{
+  position: relative;
+  padding: 120px 0 60px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* --- Stage tabs: soft glowing indicator, same as the location tabs --- */
+.cycle__tabs
+{
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  margin-bottom: 36px;
+}
+.cycle__tab
+{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 12px 6px 14px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  font: 500 12px var(--font-mono);
+  letter-spacing: .5px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color .25s ease, background .25s ease;
+}
+/* Arrow between neighbouring steps */
+.cycle__tab:not(:last-child)::before
+{
+  content: "›";
+  position: absolute;
+  top: 50%;
+  right: -4px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font: 400 18px var(--font-mono);
+  color: rgba(233, 227, 216, .25);
+}
+/* Glowing underline, lit on the active tab */
+.cycle__tab::after
+{
+  content: "";
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  bottom: 0;
+  height: 3px;
+  border-radius: 50%;
+  background: transparent;
+  filter: blur(1px);
+  pointer-events: none;
+  transition: all .3s ease;
+}
+.cycle__tab:hover
+{
+  color: #fff;
+}
+.cycle__tab--active
+{
+  color: #fff;
+  background: radial-gradient(ellipse at 50% 90%, rgba(214, 58, 51, .14) 0%, transparent 72%);
+}
+.cycle__tab--active::after
+{
+  background: radial-gradient(ellipse at center, var(--red) 0%, rgba(214, 58, 51, .8) 45%, transparent 100%);
+  box-shadow: 0 0 12px 2px rgba(214, 58, 51, .85), 0 0 24px 6px rgba(214, 58, 51, .4);
+}
+.cycle__tab-step
+{
+  font-size: 10px;
+  color: var(--red);
+}
+.cycle__tab-name
+{
+  font: 700 16px var(--font-head);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+/* --- Stage view: text on the left, the picture bleeds to both screen edges behind it --- */
+.cycle__stages
+{
+  position: relative;
+  z-index: 2;
+}
+.cycle__stage
+{
+  position: relative;
+  display: none;
+  align-items: center;
+  gap: 44px;
+  min-height: 560px;
+}
+.cycle__stage--active
+{
+  display: flex;
+  animation: cycle-stage-fade .4s ease-out;
+}
+@keyframes cycle-stage-fade
+{
+  from
+  {
+    opacity: .3;
+  }
+  to
+  {
+    opacity: 1;
+  }
+}
+
+.cycle__info
+{
+  position: relative;
+  z-index: 3;
+  flex-shrink: 0;
+  max-width: 480px;
+}
+.cycle__stage-tag
+{
+  margin-bottom: 6px;
+  font: 500 12px var(--font-mono);
+  letter-spacing: 1.5px;
+  color: var(--red);
+}
+.cycle__stage-title
+{
+  margin: 0 0 14px;
+  font: 700 clamp(30px, 3.4vw, 44px)/1.05 var(--font-head);
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.cycle__stage-desc
+{
+  margin: 0 0 24px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-body);
+}
+.cycle__features
+{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cycle__feature
+{
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font: 500 13px var(--font-mono);
+  color: #cfc9bd;
+}
+.cycle__feature::before
+{
+  content: "-";
+  color: var(--red-glow);
+}
+
+/* "New run" button on the last stage: loops back to stage 01 */
+.cycle__restart
+{
+  margin-top: 28px;
+  padding: 0 0 4px;
+  border: 0;
+  border-bottom: 1px solid var(--red);
+  background: none;
+  font: 600 13px var(--font-mono);
+  letter-spacing: 1.5px;
+  color: var(--red-glow);
+  cursor: pointer;
+  transition: color .2s, text-shadow .2s;
+}
+.cycle__restart:hover
+{
+  color: #fff;
+  text-shadow: 0 0 10px var(--red);
+}
+
+/* Full-width stage picture behind the text: fades to the left, top and bottom */
+.cycle__bleed
+{
+  position: absolute;
+  top: -40px;
+  bottom: -40px;
+  left: calc((100% - 100vw) / 2);
+  right: calc((100% - 100vw) / 2);
+  z-index: 1;
+  overflow: hidden;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, rgba(0, 0, 0, .05) 18%, rgba(0, 0, 0, .35) 36%, rgba(0, 0, 0, .8) 52%, #000 66%),
+    linear-gradient(to bottom, transparent 0%, #000 18%, #000 80%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, rgba(0, 0, 0, .05) 18%, rgba(0, 0, 0, .35) 36%, rgba(0, 0, 0, .8) 52%, #000 66%),
+    linear-gradient(to bottom, transparent 0%, #000 18%, #000 80%, transparent 100%);
+  mask-composite: intersect;
+}
+.cycle__bleed-image
+{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+  image-rendering: pixelated;
+}
+
+/* ==========================================================================
+   Waybill: worn paper order with the text laid over it (stage 01)
+   ========================================================================== */
+.waybill
+{
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+}
+.waybill__paper
+{
+  position: relative;
+  width: min(440px, 100%);
+  aspect-ratio: 803 / 1096;       /* cycle-paper.png */
+  transform: rotate(-1.5deg);
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .7));
+}
+.waybill__image
+{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  filter: brightness(1.2);
+}
+/* Text area inset to the paper's printable part */
+.waybill__text
+{
+  position: absolute;
+  top: 7%;
+  left: 9%;
+  right: 9%;
+  bottom: 6%;
+  font: 500 14px/1.6 var(--font-mono);
+  color: #2b241c;
+}
+.waybill__caption
+{
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  color: #4a3f33;
+}
+.waybill__order
+{
+  margin: 6px 0 28px;
+  font: 700 40px/1.1 var(--font-head);
+  letter-spacing: .05em;
+  color: #1e1913;
+}
+.waybill__label
+{
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #4a3f33;
+}
+.waybill__items
+{
+  margin: 6px 0 26px;
+  padding-left: 22px;
+}
+.waybill__note
+{
+  margin: 6px 0 26px;
+  color: #3a2f24;
+}
+.waybill__payment
+{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(43, 36, 28, .4);
+}
+.waybill__sum
+{
+  font-weight: 600;
+  color: #1e1913;
+}
+
+/* ==========================================================================
+   Flashlight: dark room lit by a beam that follows the pointer (stage 02, js/flashlight.js)
+   ========================================================================== */
+.flashlight
+{
+  --beam-radius: 160px;           /* Radius of the flashlight spot */
+}
+.flashlight__dim,
+.flashlight__beam
+{
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: url("../img/loop-search.png") right center / cover no-repeat;
+  image-rendering: pixelated;
+}
+/* The room as seen without the flashlight */
+.flashlight__dim
+{
+  opacity: .35;
+  filter: brightness(.35);
+}
+/* The lit spot: --beam-x / --beam-y are set from JS */
+.flashlight__beam
+{
+  opacity: 0;
+  filter: contrast(1.1) brightness(1.1);
+  transition: opacity .25s ease;
+  -webkit-mask-image: radial-gradient(circle var(--beam-radius) at var(--beam-x, -500px) var(--beam-y, -500px), #000 0%, rgba(0, 0, 0, .85) 55%, rgba(0, 0, 0, .2) 80%, transparent 100%);
+  mask-image: radial-gradient(circle var(--beam-radius) at var(--beam-x, -500px) var(--beam-y, -500px), #000 0%, rgba(0, 0, 0, .85) 55%, rgba(0, 0, 0, .2) 80%, transparent 100%);
+}
+.flashlight--on .flashlight__beam
+{
+  opacity: 1;
+}
+
+@media (max-width: 960px)
+{
+  .cycle__tabs
+  {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .cycle__tab::before
+  {
+    display: none;
+  }
+  .cycle__stage--active
+  {
+    display: block;
+  }
+  .cycle__info
+  {
+    max-width: none;
+  }
+  .cycle__bleed
+  {
+    position: relative;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    height: 340px;
+    margin: 16px calc((100% - 100vw) / 2) 0;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 20%, #000 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 20%, #000 80%, transparent 100%);
+  }
+  .waybill
+  {
+    margin-top: 36px;
+  }
+}
+
+@media (max-width: 600px)
+{
+  .cycle
+  {
+    padding: 60px 0 100px;
+  }
+  .cycle__tab-name
+  {
+    font-size: 14px;
+  }
+  .cycle__bleed
+  {
+    height: 260px;
+  }
+  .waybill__text
+  {
+    font-size: 11px;
+  }
+  .waybill__order
+  {
+    margin-bottom: 10px;
+    font-size: 24px;
+  }
+}
